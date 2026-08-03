@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 320" role="img" aria-label="India Gate">
+  <defs>
+    <filter id="s" x="-10%" y="-10%" width="120%" height="120%">
+      <feMorphology in="SourceAlpha" operator="dilate" radius="1.8" result="d"/>
+      <feFlood flood-color="#000"/><feComposite in2="d" operator="in" result="o"/>
+      <feMerge><feMergeNode in="o"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <g filter="url(#s)">
+    <path d="M70 110c90-34 190-40 300-18 85 16 160 8 250-14 45-10 80-6 100 8-40 28-110 42-205 36-105-6-210 10-295 24-48 8-85 2-150-12z" fill="#E8751C"/>
+    <path d="M75 190c95-28 195-36 310-16 90 16 170 6 255-14 40-8 75-4 95 10-42 26-115 40-210 34-110-6-215 12-300 22-50 6-88 0-150-14z" fill="#138808"/>
+    <g transform="translate(450 158)">
+      <circle r="34" fill="none" stroke="#0047A0" stroke-width="5"/>
+      <circle r="8" fill="#0047A0"/>
+    </g>
+    <text x="250" y="175" text-anchor="middle" fill="#F7F1E6" font-family="Georgia, serif" font-size="78" font-style="italic" font-weight="700">India</text>
+    <text x="650" y="175" text-anchor="middle" fill="#F7F1E6" font-family="Georgia, serif" font-size="78" font-style="italic" font-weight="700">Gate</text>
+    <text x="450" y="280" text-anchor="middle" fill="#F7F1E6" font-family="Segoe UI, Arial, sans-serif" font-size="28" font-weight="600" letter-spacing="7">TRES HERMANOS BOADILLA</text>
+  </g>
+</svg>

@@ -1,0 +1,48 @@
+[
+  {
+    "id": 1,
+    "params": {
+      "prompt": "Brief decisive cinematic camera move, no cuts. Quick pull back from the palace entrance, short aerial hop, then arrive above the royal dining hall and begin descending. Sharp focus, crisp miniature architecture, stable geometry, no lingering, no soft dreamy morph. Deep burgundy, saffron, antique gold, emerald, warm ivory. Fast graceful transition, high detail, crystal clarity. No text, no captions.",
+      "negative_prompt": "text, letters, logos, watermark, people, blurry, soft focus, dreamy, morphing, melting, smear, jitter, camera shake, warped architecture, slow motion linger, long travel, foggy",
+      "resolution": "832x480",
+      "video_length": 25,
+      "num_inference_steps": 28,
+      "guidance_scale": 5.5,
+      "guidance_phases": 1,
+      "image_prompt_type": "SE",
+      "image_start": "C:/pinokio/api/wan.git/app/noor_queue/frames/dive-01-last.png",
+      "image_end": "C:/pinokio/api/wan.git/app/noor_queue/frames/dive-02-first.png",
+      "output_filename": "connector-01",
+      "seed": 713,
+      "model_type": "flf2v_720p",
+      "base_model_type": "flf2v_720p",
+      "model_filename": "https://huggingface.co/DeepBeepMeep/Wan2.1/resolve/main/wan2.1_FLF2V_720p_14B_quanto_mbf16_int8.safetensors",
+      "type": "WanGP - First Last Frame to Video 720p (FLF2V) 14B",
+      "settings_version": 2.55
+    },
+    "plugin_data": {}
+  },
+  {
+    "id": 2,
+    "params": {
+      "prompt": "Brief decisive cinematic camera move, no cuts. Quick pull back from the dining hall table, short aerial hop, then arrive above the tandoor kitchen and brass thali and begin descending. Sharp focus, crisp miniature architecture, stable geometry, no lingering, no soft dreamy morph. Deep burgundy, saffron, antique gold, emerald, warm ivory. Fast graceful transition, high detail, crystal clarity. No text, no captions.",
+      "negative_prompt": "text, letters, logos, watermark, people, blurry, soft focus, dreamy, morphing, melting, smear, jitter, camera shake, warped architecture, warped food, slow motion linger, long travel, foggy",
+      "resolution": "832x480",
+      "video_length": 25,
+      "num_inference_steps": 28,
+      "guidance_scale": 5.5,
+      "guidance_phases": 1,
+      "image_prompt_type": "SE",
+      "image_start": "C:/pinokio/api/wan.git/app/noor_queue/frames/dive-02-last.png",
+      "image_end": "C:/pinokio/api/wan.git/app/noor_queue/frames/dive-03-first.png",
+      "output_filename": "connector-02",
+      "seed": 829,
+      "model_type": "flf2v_720p",
+      "base_model_type": "flf2v_720p",
+      "model_filename": "https://huggingface.co/DeepBeepMeep/Wan2.1/resolve/main/wan2.1_FLF2V_720p_14B_quanto_mbf16_int8.safetensors",
+      "type": "WanGP - First Last Frame to Video 720p (FLF2V) 14B",
+      "settings_version": 2.55
+    },
+    "plugin_data": {}
+  }
+]
