@@ -31,3 +31,7 @@ media/sharp-4k/
 media/stills-backup/
 media/feast-path/enhanced/
 *.ply
+
+__pycache__/
+*.pyc
+
