@@ -1,7 +1,12 @@
 import { Menu } from 'lucide-react'
 import { BorderBeam } from './ui/BorderBeam'
 
-const navItems = ['Historia', 'Experiencia', 'Carta']
+const navItems = [
+  { label: 'Historia', href: '#inicio' },
+  { label: 'Experiencia', href: '#inicio' },
+  { label: 'Carta', href: '#carta' },
+  { label: 'Admin', href: '#admin' },
+]
 
 export function Navbar() {
   return (
@@ -18,9 +23,11 @@ export function Navbar() {
           />
         </a>
 
-        <div className="navbar__links" aria-hidden="true">
+        <div className="navbar__links">
           {navItems.map((item) => (
-            <span key={item}>{item}</span>
+            <a key={item.label} href={item.href}>
+              {item.label}
+            </a>
           ))}
         </div>
 

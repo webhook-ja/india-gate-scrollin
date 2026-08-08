@@ -395,7 +395,15 @@ export function ScrollExperience() {
                   <h1>{scene.title}</h1>
                   <p className="story-card__body">{scene.body}</p>
                   {scene.cta ? (
-                    <ShimmerButton label="Descubrir el menú" tabIndex={-1} />
+                    <ShimmerButton
+                      label="Descubrir el menú"
+                      onClick={() => {
+                        document.getElementById('carta')?.scrollIntoView({
+                          behavior: 'smooth',
+                          block: 'start',
+                        })
+                      }}
+                    />
                   ) : (
                     <p className="story-card__note">
                       <ChevronDown aria-hidden="true" size={15} />
