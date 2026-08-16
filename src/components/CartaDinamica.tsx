@@ -24,11 +24,14 @@ import { cartaCategories, formatPrice, type SpiceLevel } from '../data/carta'
 import {
   ALLERGEN_LABELS,
   DIET_FILTERS,
+  dishAllergenConflict,
   type Allergen,
   type CartaItemEnriched,
   type DietTag,
 } from '../lib/carta-diet'
 import { useCartaStore } from '../lib/carta-store'
+import { useReservations } from '../lib/reservation-store'
+import { useAnalytics } from '../lib/analytics-store'
 
 const PREFS_KEY = 'india-gate-carta-prefs:v1'
 
@@ -115,16 +118,29 @@ function DishCard({
   item,
   expanded,
   onToggle,
+  allergyMode,
+  guestAllergens,
 }: {
   item: CartaItemEnriched
   expanded: boolean
   onToggle: () => void
+  allergyMode: boolean
+  guestAllergens: Allergen[]
 }) {
   const onOffer = Boolean(item.offer?.active)
   const price = onOffer && item.offer ? item.offer.price : item.price
+  const conflicts = allergyMode
+    ? dishAllergenConflict(item.diet.allergens, guestAllergens)
+    : []
+  const isAlert = allergyMode && conflicts.length > 0
+  const isSafe = allergyMode && conflicts.length === 0
 
   return (
-    <article className={`carta-dinamica__dish${expanded ? ' carta-dinamica__dish--open' : ''}`}>
+    <article
+      className={`carta-dinamica__dish${expanded ? ' carta-dinamica__dish--open' : ''}${
+        isSafe ? ' carta-dinamica__dish--safe' : ''
+      }${isAlert ? ' carta-dinamica__dish--alert' : ''}`}
+    >
       <button type="button" className="carta-dinamica__dish-toggle" onClick={onToggle}>
         <div className="carta-dinamica__dish-top">
           <div className="carta-dinamica__thumb" aria-hidden="true">
@@ -141,6 +157,16 @@ function DishCard({
             <div>
               <h3>{item.name}</h3>
               <DietBadges item={item} />
+              {isAlert ? (
+                <p className="carta-dinamica__allergy-flag" role="status">
+                  Contiene: {conflicts.map((a) => ALLERGEN_LABELS[a]).join(', ')}
+                </p>
+              ) : null}
+              {isSafe ? (
+                <p className="carta-dinamica__safe-flag" role="status">
+                  Compatible con tu perfil
+                </p>
+              ) : null}
             </div>
             <div className="carta-dinamica__dish-meta">
               <p className="carta-dinamica__price">
@@ -186,6 +212,8 @@ function DishCard({
 
 export function CartaDinamica() {
   const { items } = useCartaStore()
+  const { guestAllergens, clearGuestAllergens } = useReservations()
+  const { recordView } = useAnalytics()
   const stickyRef = useRef<HTMLDivElement>(null)
   const resultsRef = useRef<HTMLDivElement>(null)
   const scrollSelectionToTop = useRef(false)
@@ -196,6 +224,7 @@ export function CartaDinamica() {
   const [sort, setSort] = useState<SortMode>('menu')
   const [filtersOpen, setFiltersOpen] = useState(false)
   const [expanded, setExpanded] = useState<Record<string, boolean>>({})
+  const allergyMode = guestAllergens.length > 0
 
   useEffect(() => {
     setPrefs(loadPrefs())
@@ -314,6 +343,22 @@ export function CartaDinamica() {
             ingredientes y alérgenos.
           </p>
         </header>
+
+        {allergyMode ? (
+          <div className="carta-dinamica__allergy-banner" role="status">
+            <div>
+              <strong>Modo alergias activo</strong>
+              <p>
+                Perfil:{' '}
+                {guestAllergens.map((a) => ALLERGEN_LABELS[a]).join(', ')}. Los platos seguros
+                brillan; los que contienen alérgeno van en rojo.
+              </p>
+            </div>
+            <button type="button" onClick={clearGuestAllergens}>
+              Quitar modo
+            </button>
+          </div>
+        ) : null}
 
         <div className="carta-dinamica__sticky" ref={stickyRef}>
           <div className="carta-dinamica__toolbar">
@@ -476,17 +521,23 @@ export function CartaDinamica() {
                     </header>
                     <div className="carta-dinamica__grid">
                       {groupItems.map((item) => (
-                        <DishCard
-                          key={item.id}
-                          item={item}
-                          expanded={Boolean(expanded[item.id])}
-                          onToggle={() =>
-                            setExpanded((state) => ({
+                      <DishCard
+                        key={item.id}
+                        item={item}
+                        expanded={Boolean(expanded[item.id])}
+                        allergyMode={allergyMode}
+                        guestAllergens={guestAllergens}
+                        onToggle={() =>
+                          setExpanded((state) => {
+                            const nextOpen = !state[item.id]
+                            if (nextOpen) recordView(item.id)
+                            return {
                               ...state,
-                              [item.id]: !state[item.id],
-                            }))
-                          }
-                        />
+                              [item.id]: nextOpen,
+                            }
+                          })
+                        }
+                      />
                       ))}
                     </div>
                   </section>

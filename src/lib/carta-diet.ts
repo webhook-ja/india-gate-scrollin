@@ -94,6 +94,109 @@ export const ALLERGEN_LABELS: Record<Allergen, string> = {
   sesame: 'Sésamo',
 }
 
+const ALLERGEN_PATTERNS: { id: Allergen; patterns: RegExp[] }[] = [
+  {
+    id: 'gluten',
+    patterns: [
+      /\bgluten\b/i,
+      /\bcel[ií]ac/i,
+      /\bsin\s+gluten\b/i,
+      /\bwheat\b/i,
+      /\btrigo\b/i,
+      /\bharina\b/i,
+    ],
+  },
+  {
+    id: 'lactose',
+    patterns: [
+      /\bl[aá]cteos?\b/i,
+      /\blactosa\b/i,
+      /\bintolerancia\s+(a\s+)?(la\s+)?lactosa\b/i,
+      /\balergia\s+(a\s+)?(los\s+)?l[aá]cteos?\b/i,
+      /\bleche\b/i,
+      /\bqueso\b/i,
+      /\byogur\b/i,
+      /\bcrema\b/i,
+      /\bmantequilla\b/i,
+      /\bdairy\b/i,
+      /\bmilk\b/i,
+    ],
+  },
+  {
+    id: 'egg',
+    patterns: [/\bhuevos?\b/i, /\beggs?\b/i],
+  },
+  {
+    id: 'nuts',
+    patterns: [
+      /\bfrutos?\s+secos?\b/i,
+      /\balmendr/i,
+      /\bpistacho/i,
+      /\banacardo/i,
+      /\bnuez\b/i,
+      /\bnueces\b/i,
+      /\bnuts?\b/i,
+      /\bcacahuete/i,
+      /\bpeanut/i,
+    ],
+  },
+  {
+    id: 'shellfish',
+    patterns: [
+      /\bmarisco/i,
+      /\bcrust[aá]ceo/i,
+      /\bgambas?\b/i,
+      /\blangostino/i,
+      /\bshellfish\b/i,
+      /\bprawn/i,
+      /\bshrimp\b/i,
+    ],
+  },
+  {
+    id: 'fish',
+    patterns: [/\bpescado\b/i, /\bfish\b/i],
+  },
+  {
+    id: 'soy',
+    patterns: [/\bsoja\b/i, /\bsoy\b/i, /\bsoya\b/i],
+  },
+  {
+    id: 'sesame',
+    patterns: [/\bs[eé]samo\b/i, /\bsesame\b/i],
+  },
+]
+
+/** Detect allergens mentioned in free text (notes, allergy field, WhatsApp, etc.). */
+export function detectAllergensFromText(text: string): Allergen[] {
+  const raw = text.trim()
+  if (!raw) return []
+  const found = new Set<Allergen>()
+  for (const { id, patterns } of ALLERGEN_PATTERNS) {
+    if (patterns.some((re) => re.test(raw))) found.add(id)
+  }
+  return Array.from(found)
+}
+
+export function mergeAllergens(...lists: Allergen[][]): Allergen[] {
+  return Array.from(new Set(lists.flat()))
+}
+
+export function dishAllergenConflict(
+  dishAllergens: Allergen[],
+  guestAllergens: Allergen[],
+): Allergen[] {
+  if (guestAllergens.length === 0) return []
+  return dishAllergens.filter((a) => guestAllergens.includes(a))
+}
+
+/** Merge saved allergens with anything found in free-text notes. */
+export function resolveGuestAllergens(
+  saved: Allergen[] | undefined,
+  ...texts: Array<string | undefined>
+): Allergen[] {
+  return mergeAllergens(saved ?? [], ...texts.map((t) => detectAllergensFromText(t ?? '')))
+}
+
 export function enrichDiet(item: CartaItem): DietMeta {
   const blob = `${item.name} ${item.category} ${item.ingredients.join(' ')}`.toLowerCase()
 
