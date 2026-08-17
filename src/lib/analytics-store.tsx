@@ -8,6 +8,9 @@ import {
   type ReactNode,
 } from 'react'
 
+import { demoAnalyticsState } from './demo-data'
+import { USE_DEMO_ANALYTICS } from './demo-flags'
+
 const STORAGE_KEY = 'india-gate-analytics:v1'
 
 export type DishStats = {
@@ -43,30 +46,36 @@ function todayISO() {
 }
 
 function load(): AnalyticsState {
+  if (USE_DEMO_ANALYTICS) return demoAnalyticsState()
   try {
     const raw = localStorage.getItem(STORAGE_KEY)
     if (!raw) return emptyState()
     const parsed = JSON.parse(raw) as AnalyticsState
-    return {
+    const loaded = {
       dishes: parsed.dishes ?? {},
       dailyOrders: parsed.dailyOrders ?? {},
     }
+    if (Object.keys(loaded.dishes).length === 0) return emptyState()
+    return loaded
   } catch {
     return emptyState()
   }
 }
 
 export function AnalyticsStoreProvider({ children }: { children: ReactNode }) {
-  const [state, setState] = useState<AnalyticsState>(emptyState)
-  const [ready, setReady] = useState(false)
+  const [state, setState] = useState<AnalyticsState>(() =>
+    USE_DEMO_ANALYTICS ? demoAnalyticsState() : emptyState(),
+  )
+  const [ready, setReady] = useState(USE_DEMO_ANALYTICS)
 
   useEffect(() => {
+    if (USE_DEMO_ANALYTICS) return
     setState(load())
     setReady(true)
   }, [])
 
   useEffect(() => {
-    if (!ready) return
+    if (!ready || USE_DEMO_ANALYTICS) return
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(state))
     } catch {
@@ -109,7 +118,10 @@ export function AnalyticsStoreProvider({ children }: { children: ReactNode }) {
     })
   }, [])
 
-  const resetAnalytics = useCallback(() => setState(emptyState()), [])
+  const resetAnalytics = useCallback(
+    () => setState(USE_DEMO_ANALYTICS ? demoAnalyticsState() : emptyState()),
+    [],
+  )
 
   const topOrdered = useCallback(
     (limit = 8) =>

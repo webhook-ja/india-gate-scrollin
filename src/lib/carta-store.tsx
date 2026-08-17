@@ -9,6 +9,8 @@ import {
 } from 'react'
 import { cartaItems, type CartaItem, type CartaOffer } from '../data/carta'
 import { enrichDiet, type CartaItemEnriched } from './carta-diet'
+import { applyDemoCartaHealth } from './demo-data'
+import { USE_DEMO_ANALYTICS } from './demo-flags'
 
 const STORAGE_KEY = 'india-gate-admin-db:v2'
 
@@ -222,8 +224,14 @@ export function CartaStoreProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const db = loadDb()
-    setOverrides(db.overrides)
-    setInventoryState(db.inventory)
+    if (USE_DEMO_ANALYTICS) {
+      const seeded = applyDemoCartaHealth(db.overrides, db.inventory)
+      setOverrides(seeded.overrides)
+      setInventoryState(seeded.inventory)
+    } else {
+      setOverrides(db.overrides)
+      setInventoryState(db.inventory)
+    }
     setMenus(db.menus)
     setReady(true)
   }, [])

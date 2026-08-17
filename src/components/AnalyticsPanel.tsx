@@ -1,7 +1,8 @@
 import { useMemo } from 'react'
-import { AlertTriangle, BarChart3, Eye, Package, Tag, TrendingUp } from 'lucide-react'
+import { AlertTriangle, BarChart3, Eye, Package, Tag, TrendingUp, UtensilsCrossed } from 'lucide-react'
 import { useAnalytics } from '../lib/analytics-store'
 import { useCartaStore } from '../lib/carta-store'
+import { USE_DEMO_ANALYTICS } from '../lib/demo-flags'
 
 function startOfDay(d: Date) {
   const x = new Date(d)
@@ -62,11 +63,36 @@ export function AnalyticsPanel() {
   const totalOrders = Object.values(dishes).reduce((sum, d) => sum + d.orders, 0)
   const totalViews = Object.values(dishes).reduce((sum, d) => sum + d.views, 0)
 
+  const byCategory = useMemo(() => {
+    const map = new Map<string, { orders: number; views: number }>()
+    for (const item of items) {
+      const stats = dishes[item.id]
+      if (!stats || (stats.orders === 0 && stats.views === 0)) continue
+      const prev = map.get(item.category) ?? { orders: 0, views: 0 }
+      map.set(item.category, {
+        orders: prev.orders + stats.orders,
+        views: prev.views + stats.views,
+      })
+    }
+    return Array.from(map.entries())
+      .map(([category, stats]) => ({
+        category: category.replace(' (incluye arroz)', '').replace(' (no picante)', ''),
+        ...stats,
+      }))
+      .sort((a, b) => b.orders - a.orders)
+      .slice(0, 8)
+  }, [items, dishes])
+  const maxCategory = Math.max(1, ...byCategory.map((row) => row.orders), 1)
+
   return (
     <div className="admin-v2__stack admin-analytics">
       <header className="admin-v2__panel-head">
         <h3>Analítica de la carta</h3>
-        <p>Platos más pedidos, visitas, stock y ofertas — para decidir rápido</p>
+        <p>
+          {USE_DEMO_ANALYTICS
+            ? 'Datos de ejemplo de una semana de servicio — ventas, visitas, stock y ofertas'
+            : 'Platos más pedidos, visitas, stock y ofertas — para decidir rápido'}
+        </p>
       </header>
 
       <div className="admin-analytics__kpis">
@@ -108,7 +134,7 @@ export function AnalyticsPanel() {
             <h3>
               <BarChart3 size={16} /> Platos más pedidos
             </h3>
-            <p>Cada −1 de inventario cuenta como venta</p>
+            <p>Ranking de la semana · el más pedido primero</p>
           </header>
           {ordered.length === 0 ? (
             <div className="admin-v2__empty">
@@ -144,7 +170,7 @@ export function AnalyticsPanel() {
             <h3>
               <Eye size={16} /> Más vistos en carta
             </h3>
-            <p>Clientes que abren el detalle del plato</p>
+            <p>Quién abre el detalle en la carta pública</p>
           </header>
           {viewed.length === 0 ? (
             <div className="admin-v2__empty">
@@ -166,7 +192,7 @@ export function AnalyticsPanel() {
         <section className="admin-v2__panel">
           <header className="admin-v2__panel-head">
             <h3>Ventas diarias (platos)</h3>
-            <p>Unidades descontadas de inventario</p>
+            <p>Últimos 7 días · fin de semana más lleno</p>
           </header>
           <div className="admin-analytics__daybars">
             {days.map((day) => {
@@ -189,6 +215,34 @@ export function AnalyticsPanel() {
               )
             })}
           </div>
+        </section>
+
+        <section className="admin-v2__panel">
+          <header className="admin-v2__panel-head">
+            <h3>
+              <UtensilsCrossed size={16} /> Ventas por categoría
+            </h3>
+            <p>Dónde se concentra el ticket</p>
+          </header>
+          {byCategory.length === 0 ? (
+            <div className="admin-v2__empty">
+              <p>Sin ventas por categoría todavía.</p>
+            </div>
+          ) : (
+            <ul className="admin-analytics__bars">
+              {byCategory.map((row) => (
+                <li key={row.category}>
+                  <div className="admin-analytics__bar-meta">
+                    <strong>{row.category}</strong>
+                    <span>{row.orders}</span>
+                  </div>
+                  <div className="admin-analytics__bar-track">
+                    <i style={{ width: `${(row.orders / maxCategory) * 100}%` }} />
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
         </section>
 
         <section className="admin-v2__panel">
@@ -233,7 +287,7 @@ export function AnalyticsPanel() {
 
       <div className="admin-v2__actions-row">
         <button type="button" className="admin-v2__btn admin-v2__btn--ghost" onClick={resetAnalytics}>
-          Reiniciar contadores de ventas/vistas
+          {USE_DEMO_ANALYTICS ? 'Restaurar datos de ejemplo' : 'Reiniciar contadores de ventas/vistas'}
         </button>
       </div>
     </div>
