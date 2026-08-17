@@ -73,7 +73,15 @@ export function Navbar({ onReserve }: NavbarProps) {
                 {item.label}
               </button>
             ) : (
-              <a key={item.label} href={item.href}>
+              <a
+                key={item.label}
+                href={item.href}
+                onClick={(event) => {
+                  event.preventDefault()
+                  closeMenu()
+                  window.location.hash = item.href
+                }}
+              >
                 {item.label}
               </a>
             ),
@@ -100,23 +108,14 @@ export function Navbar({ onReserve }: NavbarProps) {
               <span className="navbar__dot" aria-hidden="true" />
             </BorderBeam>
           ) : (
-            <BorderBeam
-              className="navbar__reservation"
-              duration={9}
-              role="button"
-              tabIndex={0}
+            <button
+              type="button"
+              className="navbar__reservation navbar__reservation--static"
               aria-label="Ver carta"
               onClick={goCarta}
-              onKeyDown={(event) => {
-                if (event.key === 'Enter' || event.key === ' ') {
-                  event.preventDefault()
-                  goCarta()
-                }
-              }}
             >
               <span>Ver carta</span>
-              <span className="navbar__dot" aria-hidden="true" />
-            </BorderBeam>
+            </button>
           )}
 
           <button
@@ -145,7 +144,15 @@ export function Navbar({ onReserve }: NavbarProps) {
                   {item.label}
                 </button>
               ) : (
-                <a key={item.label} href={item.href} onClick={closeMenu}>
+                <a
+                  key={item.label}
+                  href={item.href}
+                  onClick={(event) => {
+                    event.preventDefault()
+                    closeMenu()
+                    window.location.hash = item.href
+                  }}
+                >
                   {item.label}
                 </a>
               ),

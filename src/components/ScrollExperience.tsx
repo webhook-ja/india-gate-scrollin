@@ -399,10 +399,7 @@ export function ScrollExperience() {
                     <ShimmerButton
                       label="Descubrir el menú"
                       onClick={() => {
-                        document.getElementById('carta')?.scrollIntoView({
-                          behavior: 'smooth',
-                          block: 'start',
-                        })
+                        window.location.hash = '#carta'
                       }}
                     />
                   ) : (

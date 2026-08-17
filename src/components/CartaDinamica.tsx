@@ -333,7 +333,7 @@ export function CartaDinamica() {
   const activeFilterCount = prefs.length + (activeCategory !== 'all' ? 1 : 0) + (query ? 1 : 0)
 
   return (
-    <section id="carta" className="carta-dinamica" aria-labelledby="carta-title">
+    <section id="carta-panel" className="carta-dinamica" aria-labelledby="carta-title">
       <div className="carta-dinamica__inner">
         <header className="carta-dinamica__intro">
           <p className="carta-dinamica__eyebrow">Carta inteligente</p>

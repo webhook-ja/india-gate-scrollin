@@ -1,4 +1,6 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useLayoutEffect, useState } from 'react'
+import gsap from 'gsap'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { Navbar } from './components/Navbar'
 import { ScrollExperience } from './components/ScrollExperience'
 import { CartaDinamica } from './components/CartaDinamica'
@@ -10,11 +12,21 @@ import { AnalyticsStoreProvider } from './lib/analytics-store'
 import { SHOW_RESERVATIONS } from './lib/demo-flags'
 import { publicUrl } from './lib/public-url'
 
-type View = 'home' | 'admin'
+gsap.registerPlugin(ScrollTrigger)
+
+type View = 'home' | 'carta' | 'admin'
 
 function readView(): View {
   const hash = window.location.hash
-  return hash === '#admin' ? 'admin' : 'home'
+  if (hash === '#admin') return 'admin'
+  if (hash === '#carta') return 'carta'
+  return 'home'
+}
+
+function jumpToTop() {
+  window.scrollTo(0, 0)
+  document.documentElement.scrollTop = 0
+  document.body.scrollTop = 0
 }
 
 function AppShell() {
@@ -24,6 +36,7 @@ function AppShell() {
   const [bookingOpen, setBookingOpen] = useState(false)
 
   useEffect(() => {
+    history.scrollRestoration = 'manual'
     const sync = () => {
       setView(readView())
       if (SHOW_RESERVATIONS && window.location.hash === '#reservar') setBookingOpen(true)
@@ -32,6 +45,23 @@ function AppShell() {
     window.addEventListener('hashchange', sync)
     return () => window.removeEventListener('hashchange', sync)
   }, [])
+
+  useLayoutEffect(() => {
+    document.documentElement.dataset.view = view
+    if (view !== 'home') {
+      ScrollTrigger.getAll().forEach((trigger) => trigger.kill())
+    }
+    jumpToTop()
+    const frame = requestAnimationFrame(() => {
+      jumpToTop()
+      requestAnimationFrame(jumpToTop)
+    })
+    const timer = window.setTimeout(jumpToTop, 50)
+    return () => {
+      cancelAnimationFrame(frame)
+      window.clearTimeout(timer)
+    }
+  }, [view])
 
   const openBooking = () => {
     if (!SHOW_RESERVATIONS) return
@@ -53,11 +83,10 @@ function AppShell() {
       <Navbar onReserve={openBooking} />
       {view === 'admin' ? (
         <AdminCarta />
+      ) : view === 'carta' ? (
+        <CartaDinamica />
       ) : (
-        <>
-          <ScrollExperience />
-          <CartaDinamica />
-        </>
+        <ScrollExperience />
       )}
 
       <section className="seo-copy" data-sw-seo aria-label="Resumen de la experiencia">
@@ -68,7 +97,7 @@ function AppShell() {
         </p>
       </section>
 
-      <footer className="site-footer">
+      <footer className={`site-footer${view === 'home' ? '' : ' site-footer--compact'}`}>
         <img
           className="site-footer__logo"
           src={publicUrl('brand/wordmark.png?v=orig8k2')}

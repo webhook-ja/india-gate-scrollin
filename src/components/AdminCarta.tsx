@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useLayoutEffect, useMemo, useState } from 'react'
 import {
   AlertTriangle,
   BadgePercent,
@@ -868,8 +868,14 @@ export function AdminCarta() {
   const [tab, setTab] = useState<AdminTab>('productos')
   const [publishMenuId, setPublishMenuId] = useState<string | undefined>()
 
+  useLayoutEffect(() => {
+    window.scrollTo(0, 0)
+    document.documentElement.scrollTop = 0
+    document.body.scrollTop = 0
+  }, [])
+
   return (
-    <section id="admin" className="admin-v2" aria-labelledby="admin-title">
+    <section id="admin-panel" className="admin-v2" aria-labelledby="admin-title">
       <div className="admin-v2__inner">
         <header className="admin-v2__intro">
           <p className="admin-v2__eyebrow">Panel Chaini · Carta</p>
