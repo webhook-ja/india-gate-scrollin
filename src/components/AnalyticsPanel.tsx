@@ -1,17 +1,7 @@
 import { useMemo } from 'react'
-import {
-  AlertTriangle,
-  BarChart3,
-  CalendarDays,
-  Eye,
-  Package,
-  TrendingUp,
-  Users,
-} from 'lucide-react'
-import { ALLERGEN_LABELS, resolveGuestAllergens, type Allergen } from '../lib/carta-diet'
+import { AlertTriangle, BarChart3, Eye, Package, Tag, TrendingUp } from 'lucide-react'
 import { useAnalytics } from '../lib/analytics-store'
 import { useCartaStore } from '../lib/carta-store'
-import { useReservations } from '../lib/reservation-store'
 
 function startOfDay(d: Date) {
   const x = new Date(d)
@@ -36,7 +26,6 @@ function lastNDays(n: number) {
 
 export function AnalyticsPanel() {
   const { items, inventory } = useCartaStore()
-  const { reservations } = useReservations()
   const { topOrdered, topViewed, dailyOrders, recordOrder, resetAnalytics, dishes } =
     useAnalytics()
 
@@ -45,56 +34,6 @@ export function AnalyticsPanel() {
     for (const item of items) map.set(item.id, item.name)
     return map
   }, [items])
-
-  const reservationStats = useMemo(() => {
-    const weekStart = startOfDay(new Date())
-    weekStart.setDate(weekStart.getDate() - 6)
-    const weekIso = isoDay(weekStart)
-    const daysLocal = lastNDays(7)
-
-    const active = reservations.filter(
-      (r) => r.status === 'pending' || r.status === 'confirmed' || r.status === 'arrived',
-    )
-    const week = reservations.filter((r) => r.datetime.slice(0, 10) >= weekIso)
-    const pending = reservations.filter((r) => r.status === 'pending').length
-    const confirmed = reservations.filter((r) => r.status === 'confirmed').length
-    const pax = week.reduce((sum, r) => sum + r.party, 0)
-    const avgParty = week.length ? pax / week.length : 0
-
-    const allergyCount = new Map<Allergen, number>()
-    let allergyReservations = 0
-    for (const r of reservations) {
-      const allergens = resolveGuestAllergens(r.allergens, r.message, r.notes)
-      if (allergens.length === 0) continue
-      allergyReservations += 1
-      for (const a of allergens) allergyCount.set(a, (allergyCount.get(a) ?? 0) + 1)
-    }
-    const topAllergies = Array.from(allergyCount.entries())
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, 5)
-
-    const byDay = daysLocal.map((day) => ({
-      day,
-      count: reservations.filter((r) => r.datetime.startsWith(day)).length,
-      pax: reservations
-        .filter((r) => r.datetime.startsWith(day))
-        .reduce((sum, r) => sum + r.party, 0),
-    }))
-    const maxResDay = Math.max(1, ...byDay.map((d) => d.count))
-
-    return {
-      active: active.length,
-      week: week.length,
-      pending,
-      confirmed,
-      avgParty,
-      allergyReservations,
-      topAllergies,
-      byDay,
-      maxResDay,
-      paxWeek: pax,
-    }
-  }, [reservations])
 
   const ordered = topOrdered(10)
   const viewed = topViewed(8)
@@ -119,30 +58,27 @@ export function AnalyticsPanel() {
 
   const hidden = items.filter((i) => i.available === false).length
   const offers = items.filter((i) => i.offer?.active).length
+  const tracked = items.filter((i) => inventory[i.id]?.track).length
   const totalOrders = Object.values(dishes).reduce((sum, d) => sum + d.orders, 0)
+  const totalViews = Object.values(dishes).reduce((sum, d) => sum + d.views, 0)
 
   return (
     <div className="admin-v2__stack admin-analytics">
       <header className="admin-v2__panel-head">
-        <h3>Analítica del local</h3>
-        <p>Platos más pedidos, reservas, stock y alergias — para decidir rápido</p>
+        <h3>Analítica de la carta</h3>
+        <p>Platos más pedidos, visitas, stock y ofertas — para decidir rápido</p>
       </header>
 
       <div className="admin-analytics__kpis">
         <article className="admin-analytics__kpi">
-          <Users size={16} />
-          <strong>{reservationStats.week}</strong>
-          <span>Reservas (7 días)</span>
-        </article>
-        <article className="admin-analytics__kpi">
-          <CalendarDays size={16} />
-          <strong>{reservationStats.pending}</strong>
-          <span>Pendientes</span>
-        </article>
-        <article className="admin-analytics__kpi">
           <TrendingUp size={16} />
           <strong>{totalOrders}</strong>
           <span>Platos vendidos</span>
+        </article>
+        <article className="admin-analytics__kpi">
+          <Eye size={16} />
+          <strong>{totalViews}</strong>
+          <span>Vistas en carta</span>
         </article>
         <article className="admin-analytics__kpi">
           <Package size={16} />
@@ -150,14 +86,19 @@ export function AnalyticsPanel() {
           <span>Stock bajo</span>
         </article>
         <article className="admin-analytics__kpi">
-          <AlertTriangle size={16} />
-          <strong>{reservationStats.allergyReservations}</strong>
-          <span>Con alergia</span>
+          <Tag size={16} />
+          <strong>{offers}</strong>
+          <span>Ofertas activas</span>
         </article>
         <article className="admin-analytics__kpi">
-          <Eye size={16} />
-          <strong>{reservationStats.avgParty.toFixed(1)}</strong>
-          <span>Pax medio</span>
+          <AlertTriangle size={16} />
+          <strong>{hidden}</strong>
+          <span>Platos ocultos</span>
+        </article>
+        <article className="admin-analytics__kpi">
+          <BarChart3 size={16} />
+          <strong>{tracked}</strong>
+          <span>Con inventario</span>
         </article>
       </div>
 
@@ -224,35 +165,6 @@ export function AnalyticsPanel() {
 
         <section className="admin-v2__panel">
           <header className="admin-v2__panel-head">
-            <h3>Reservas por día</h3>
-            <p>Últimos 7 días</p>
-          </header>
-          <div className="admin-analytics__daybars" aria-label="Reservas por día">
-            {reservationStats.byDay.map((row) => {
-              const label = new Date(`${row.day}T12:00:00`).toLocaleDateString('es-ES', {
-                weekday: 'short',
-                day: 'numeric',
-              })
-              return (
-                <div key={row.day} className="admin-analytics__day">
-                  <div className="admin-analytics__day-col">
-                    <i
-                      style={{
-                        height: `${Math.max(8, (row.count / reservationStats.maxResDay) * 100)}%`,
-                      }}
-                      title={`${row.count} reservas · ${row.pax} pax`}
-                    />
-                  </div>
-                  <span>{label}</span>
-                  <strong>{row.count}</strong>
-                </div>
-              )
-            })}
-          </div>
-        </section>
-
-        <section className="admin-v2__panel">
-          <header className="admin-v2__panel-head">
             <h3>Ventas diarias (platos)</h3>
             <p>Unidades descontadas de inventario</p>
           </header>
@@ -281,33 +193,14 @@ export function AnalyticsPanel() {
 
         <section className="admin-v2__panel">
           <header className="admin-v2__panel-head">
-            <h3>
-              <AlertTriangle size={16} /> Alergias frecuentes
-            </h3>
-            <p>Detectadas en reservas y notas</p>
-          </header>
-          {reservationStats.topAllergies.length === 0 ? (
-            <div className="admin-v2__empty">
-              <p>Sin alertas de alergia todavía.</p>
-            </div>
-          ) : (
-            <ul className="admin-analytics__list admin-analytics__list--alert">
-              {reservationStats.topAllergies.map(([id, count]) => (
-                <li key={id}>
-                  <strong>{ALLERGEN_LABELS[id]}</strong>
-                  <span>{count} reservas</span>
-                </li>
-              ))}
-            </ul>
-          )}
-        </section>
-
-        <section className="admin-v2__panel">
-          <header className="admin-v2__panel-head">
             <h3>Salud de carta</h3>
             <p>Inventario y visibilidad</p>
           </header>
           <ul className="admin-analytics__health">
+            <li>
+              <span>Platos en carta</span>
+              <strong>{items.length}</strong>
+            </li>
             <li>
               <span>Platos ocultos</span>
               <strong>{hidden}</strong>
@@ -317,12 +210,8 @@ export function AnalyticsPanel() {
               <strong>{offers}</strong>
             </li>
             <li>
-              <span>Pax semana</span>
-              <strong>{reservationStats.paxWeek}</strong>
-            </li>
-            <li>
-              <span>Confirmadas</span>
-              <strong>{reservationStats.confirmed}</strong>
+              <span>Con inventario</span>
+              <strong>{tracked}</strong>
             </li>
           </ul>
           {lowStock.length > 0 ? (

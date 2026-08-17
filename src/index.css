@@ -2105,8 +2105,10 @@ button {
 .admin-v2__tabs button {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 6px;
-  flex: 0 0 auto;
+  flex: 1 1 0;
+  min-width: 0;
   padding: 10px 14px;
   border: 0;
   border-radius: 12px;
@@ -3562,6 +3564,7 @@ svg {
   }
 
   .admin-v2__tabs button {
+    flex: 0 0 auto;
     padding: 10px 12px;
     font-size: 13px;
   }

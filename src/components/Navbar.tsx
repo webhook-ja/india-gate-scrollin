@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react'
 import { Menu, X } from 'lucide-react'
+import { SHOW_RESERVATIONS } from '../lib/demo-flags'
 import { BorderBeam } from './ui/BorderBeam'
 
 const navItems = [
   { label: 'Historia', href: '#inicio' },
   { label: 'Experiencia', href: '#inicio' },
   { label: 'Carta', href: '#carta' },
-  { label: 'Reservar', href: '#reservar' },
+  ...(SHOW_RESERVATIONS ? [{ label: 'Reservar', href: '#reservar' }] : []),
   { label: 'Admin', href: '#admin' },
 ]
 
@@ -38,6 +39,11 @@ export function Navbar({ onReserve }: NavbarProps) {
   const goReserve = () => {
     closeMenu()
     onReserve?.()
+  }
+
+  const goCarta = () => {
+    closeMenu()
+    window.location.hash = '#carta'
   }
 
   return (
@@ -74,23 +80,43 @@ export function Navbar({ onReserve }: NavbarProps) {
         </div>
 
         <div className="navbar__end">
-          <BorderBeam
-            className="navbar__reservation"
-            duration={9}
-            role="button"
-            tabIndex={0}
-            aria-label="Reservar mesa"
-            onClick={goReserve}
-            onKeyDown={(event) => {
-              if (event.key === 'Enter' || event.key === ' ') {
-                event.preventDefault()
-                goReserve()
-              }
-            }}
-          >
-            <span>Reservar mesa</span>
-            <span className="navbar__dot" aria-hidden="true" />
-          </BorderBeam>
+          {SHOW_RESERVATIONS ? (
+            <BorderBeam
+              className="navbar__reservation"
+              duration={9}
+              role="button"
+              tabIndex={0}
+              aria-label="Reservar mesa"
+              onClick={goReserve}
+              onKeyDown={(event) => {
+                if (event.key === 'Enter' || event.key === ' ') {
+                  event.preventDefault()
+                  goReserve()
+                }
+              }}
+            >
+              <span>Reservar mesa</span>
+              <span className="navbar__dot" aria-hidden="true" />
+            </BorderBeam>
+          ) : (
+            <BorderBeam
+              className="navbar__reservation"
+              duration={9}
+              role="button"
+              tabIndex={0}
+              aria-label="Ver carta"
+              onClick={goCarta}
+              onKeyDown={(event) => {
+                if (event.key === 'Enter' || event.key === ' ') {
+                  event.preventDefault()
+                  goCarta()
+                }
+              }}
+            >
+              <span>Ver carta</span>
+              <span className="navbar__dot" aria-hidden="true" />
+            </BorderBeam>
+          )}
 
           <button
             className="navbar__menu"

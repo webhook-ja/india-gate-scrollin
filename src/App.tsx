@@ -7,6 +7,7 @@ import { ReservationBooking } from './components/ReservationBooking'
 import { CartaStoreProvider } from './lib/carta-store'
 import { ReservationStoreProvider } from './lib/reservation-store'
 import { AnalyticsStoreProvider } from './lib/analytics-store'
+import { SHOW_RESERVATIONS } from './lib/demo-flags'
 
 type View = 'home' | 'admin'
 
@@ -24,7 +25,7 @@ function AppShell() {
   useEffect(() => {
     const sync = () => {
       setView(readView())
-      if (window.location.hash === '#reservar') setBookingOpen(true)
+      if (SHOW_RESERVATIONS && window.location.hash === '#reservar') setBookingOpen(true)
     }
     sync()
     window.addEventListener('hashchange', sync)
@@ -32,6 +33,7 @@ function AppShell() {
   }, [])
 
   const openBooking = () => {
+    if (!SHOW_RESERVATIONS) return
     setBookingOpen(true)
     if (window.location.hash !== '#reservar') {
       window.history.replaceState(null, '', '#reservar')
@@ -74,15 +76,23 @@ function AppShell() {
           height={255}
         />
         <span>Comida india · Tres Hermanos Boadilla</span>
-        <button type="button" className="site-footer__admin" onClick={openBooking}>
-          Reservar mesa
-        </button>
+        {SHOW_RESERVATIONS ? (
+          <button type="button" className="site-footer__admin" onClick={openBooking}>
+            Reservar mesa
+          </button>
+        ) : (
+          <a className="site-footer__admin" href="#carta">
+            Ver carta
+          </a>
+        )}
         <a className="site-footer__admin" href="#admin">
           Admin carta
         </a>
       </footer>
 
-      <ReservationBooking open={bookingOpen} onClose={closeBooking} />
+      {SHOW_RESERVATIONS ? (
+        <ReservationBooking open={bookingOpen} onClose={closeBooking} />
+      ) : null}
     </>
   )
 }

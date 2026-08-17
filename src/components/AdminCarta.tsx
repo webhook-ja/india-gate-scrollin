@@ -37,10 +37,11 @@ import { formatDisplayDate } from '../lib/reservation-engine'
 import { useReservations } from '../lib/reservation-store'
 import type { ReservationStatus } from '../lib/reservation-types'
 import { ALLERGEN_LABELS, resolveGuestAllergens } from '../lib/carta-diet'
+import { SHOW_RESERVATIONS } from '../lib/demo-flags'
 
 type AdminTab = 'productos' | 'inventario' | 'menus' | 'reservas' | 'analitica' | 'publicar'
 
-const TABS: { id: AdminTab; label: string }[] = [
+const ALL_TABS: { id: AdminTab; label: string }[] = [
   { id: 'productos', label: 'Productos' },
   { id: 'inventario', label: 'Inventario' },
   { id: 'menus', label: 'Menús' },
@@ -48,6 +49,8 @@ const TABS: { id: AdminTab; label: string }[] = [
   { id: 'analitica', label: 'Analítica' },
   { id: 'publicar', label: 'Publicar' },
 ]
+
+const TABS = ALL_TABS.filter((item) => SHOW_RESERVATIONS || item.id !== 'reservas')
 
 const PRICE_STEPS = [0.5, 1, 2]
 
@@ -869,11 +872,11 @@ export function AdminCarta() {
     <section id="admin" className="admin-v2" aria-labelledby="admin-title">
       <div className="admin-v2__inner">
         <header className="admin-v2__intro">
-          <p className="admin-v2__eyebrow">Panel Chaini</p>
-          <h2 id="admin-title">Administración fácil</h2>
+          <p className="admin-v2__eyebrow">Panel Chaini · Carta</p>
+          <h2 id="admin-title">Administración de la carta</h2>
           <p>
-            Casi sin escribir: selecciona productos, controla inventario, arma menús con plantillas
-            y publícalos.
+            Productos, inventario, menús del día, analítica y publicación. Todo el control de la
+            carta, sin escribir de más.
           </p>
         </header>
 
@@ -906,7 +909,7 @@ export function AdminCarta() {
             }}
           />
         ) : null}
-        {tab === 'reservas' ? <ReservationsPanel /> : null}
+        {SHOW_RESERVATIONS && tab === 'reservas' ? <ReservationsPanel /> : null}
         {tab === 'analitica' ? <AnalyticsPanel /> : null}
         {tab === 'publicar' ? <PublishPanel initialMenuId={publishMenuId} /> : null}
       </div>
