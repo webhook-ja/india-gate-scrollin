@@ -363,8 +363,8 @@ button {
     #f0f4f8 100%
   );
   background-size: 220% 220%;
-  -webkit-mask-image: url('/brand/namaste-white.png?v=silver4');
-  mask-image: url('/brand/namaste-white.png?v=silver4');
+  -webkit-mask-image: var(--namaste-mask);
+  mask-image: var(--namaste-mask);
   -webkit-mask-size: contain;
   mask-size: contain;
   -webkit-mask-repeat: no-repeat;

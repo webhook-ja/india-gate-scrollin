@@ -4,6 +4,7 @@ import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { ChevronDown, VolumeX } from 'lucide-react'
 import { scrollWorldConfig } from '../lib/scroll-world-config'
+import { publicUrl } from '../lib/public-url'
 import { FeastPath } from './FeastPath'
 import { ShimmerButton } from './ui/ShimmerButton'
 
@@ -344,7 +345,7 @@ export function ScrollExperience() {
             <img
               className="brand-logo-stack__banner"
               ref={brandBannerRef}
-              src="/brand/wordmark-banner.png?v=3"
+              src={publicUrl('brand/wordmark-banner.png?v=3')}
               alt="India Gate — Tres Hermanos Boadilla"
               width={1497}
               height={429}

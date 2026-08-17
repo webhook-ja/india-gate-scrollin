@@ -8,6 +8,7 @@ import { CartaStoreProvider } from './lib/carta-store'
 import { ReservationStoreProvider } from './lib/reservation-store'
 import { AnalyticsStoreProvider } from './lib/analytics-store'
 import { SHOW_RESERVATIONS } from './lib/demo-flags'
+import { publicUrl } from './lib/public-url'
 
 type View = 'home' | 'admin'
 
@@ -70,7 +71,7 @@ function AppShell() {
       <footer className="site-footer">
         <img
           className="site-footer__logo"
-          src="/brand/wordmark.png?v=orig8k2"
+          src={publicUrl('brand/wordmark.png?v=orig8k2')}
           alt="India Gate — Tres Hermanos Boadilla"
           width={280}
           height={255}

@@ -1,3 +1,5 @@
+import { publicUrl } from './public-url'
+
 export type ScrollClip = {
   id: string
   src: string
@@ -44,33 +46,33 @@ export const scrollWorldConfig = {
   clips: [
     {
       id: 'brand',
-      src: '/scroll-world/video/dive-00.mp4',
-      mobileSrc: '/scroll-world/video/dive-00-m.mp4',
-      poster: '/scroll-world/stills/poster-dive-00.png',
+      src: publicUrl('/scroll-world/video/dive-00.mp4'),
+      mobileSrc: publicUrl('/scroll-world/video/dive-00-m.mp4'),
+      poster: publicUrl('/scroll-world/stills/poster-dive-00.png'),
       weight: 1.5,
       kind: 'dive',
     },
     {
       id: 'biryani',
-      src: '/scroll-world/video/dive-feast-biryani.mp4',
-      mobileSrc: '/scroll-world/video/dive-feast-biryani-m.mp4',
-      poster: '/scroll-world/stills/poster-dive-feast-biryani.png',
+      src: publicUrl('/scroll-world/video/dive-feast-biryani.mp4'),
+      mobileSrc: publicUrl('/scroll-world/video/dive-feast-biryani-m.mp4'),
+      poster: publicUrl('/scroll-world/stills/poster-dive-feast-biryani.png'),
       weight: 1.25,
       kind: 'dive',
     },
     {
       id: 'sizzler',
-      src: '/scroll-world/video/dive-feast-sizzler.mp4',
-      mobileSrc: '/scroll-world/video/dive-feast-sizzler-m.mp4',
-      poster: '/scroll-world/stills/poster-dive-feast-sizzler.png',
+      src: publicUrl('/scroll-world/video/dive-feast-sizzler.mp4'),
+      mobileSrc: publicUrl('/scroll-world/video/dive-feast-sizzler-m.mp4'),
+      poster: publicUrl('/scroll-world/stills/poster-dive-feast-sizzler.png'),
       weight: 1.35,
       kind: 'dive',
     },
     {
       id: 'firma',
-      src: '/scroll-world/video/dive-feast-firma.mp4',
-      mobileSrc: '/scroll-world/video/dive-feast-firma-m.mp4',
-      poster: '/scroll-world/stills/poster-dive-feast-firma.png',
+      src: publicUrl('/scroll-world/video/dive-feast-firma.mp4'),
+      mobileSrc: publicUrl('/scroll-world/video/dive-feast-firma-m.mp4'),
+      poster: publicUrl('/scroll-world/stills/poster-dive-feast-firma.png'),
       weight: 1.4,
       kind: 'dive',
     },
@@ -78,7 +80,7 @@ export const scrollWorldConfig = {
   feastDishes: [
     {
       id: 'samosas',
-      src: '/scroll-world/stills/feast/01-samosas.png',
+      src: publicUrl('/scroll-world/stills/feast/01-samosas.png'),
       alt: 'Samosas crujientes',
       lane: -1,
       start: 0.16,
@@ -86,7 +88,7 @@ export const scrollWorldConfig = {
     },
     {
       id: 'biryani',
-      src: '/scroll-world/stills/feast/02-biryani.png',
+      src: publicUrl('/scroll-world/stills/feast/02-biryani.png'),
       alt: 'Biryani de la casa',
       lane: 1,
       start: 0.26,
@@ -94,7 +96,7 @@ export const scrollWorldConfig = {
     },
     {
       id: 'sizzler',
-      src: '/scroll-world/stills/feast/03-sizzler.png',
+      src: publicUrl('/scroll-world/stills/feast/03-sizzler.png'),
       alt: 'Sizzler al carbón',
       lane: 0,
       start: 0.38,
@@ -102,7 +104,7 @@ export const scrollWorldConfig = {
     },
     {
       id: 'curry-rojo',
-      src: '/scroll-world/stills/feast/04-curry-rojo.png',
+      src: publicUrl('/scroll-world/stills/feast/04-curry-rojo.png'),
       alt: 'Masala de la olla',
       lane: -1,
       start: 0.5,
@@ -110,7 +112,7 @@ export const scrollWorldConfig = {
     },
     {
       id: 'naan',
-      src: '/scroll-world/stills/feast/05-naan.png',
+      src: publicUrl('/scroll-world/stills/feast/05-naan.png'),
       alt: 'Naan del tandoor',
       lane: 1,
       start: 0.62,
@@ -118,7 +120,7 @@ export const scrollWorldConfig = {
     },
     {
       id: 'firma',
-      src: '/scroll-world/stills/feast/06-curry-firma.png',
+      src: publicUrl('/scroll-world/stills/feast/06-curry-firma.png'),
       alt: 'El plato para recordar',
       lane: 0,
       start: 0.74,

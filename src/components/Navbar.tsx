@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Menu, X } from 'lucide-react'
 import { SHOW_RESERVATIONS } from '../lib/demo-flags'
+import { publicUrl } from '../lib/public-url'
 import { BorderBeam } from './ui/BorderBeam'
 
 const navItems = [
@@ -52,7 +53,7 @@ export function Navbar({ onReserve }: NavbarProps) {
         <a className="wordmark" href="#inicio" aria-label="India Gate" onClick={closeMenu}>
           <img
             className="wordmark__mark"
-            src="/brand/nav-namaste.png?v=silver3"
+            src={publicUrl('brand/nav-namaste.png?v=silver3')}
             alt=""
             width={44}
             height={44}
